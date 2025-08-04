@@ -1,4 +1,18 @@
+import os
 import pandas as pd
+
+
+def load_file(file_path):
+    extension = os.path.splitext(file_path)[1].lower()
+    
+    if extension == '.csv':
+        df = pd.read_csv(file_path)
+    elif extension in ['.xls', '.xlsx']:
+        df = pd.read_excel(file_path)
+    else:
+        raise ValueError("Unsupported file type. Only .csv, .xls, and .xlsx are allowed.")
+    
+    return df
 
 def basic_statistics(df):
     print(f"rows: {df.shape[0]}")
@@ -11,22 +25,26 @@ def basic_statistics(df):
     print(df.describe().drop('count'))
     return
 
+
 def filter_by_value(df, column, value):
     return df[df[column] == value]
 
 
 def main():
-    csv_path = input("Enter the path of a CSV file: ").strip()
+    path = input("Enter the path of a CSV file: ").strip()
     
     try:
-        df = pd.read_csv(csv_path)
+        df = load_file(path)
         basic_statistics(df)
     except FileNotFoundError:
         print("❌ File not found. Please check the path and try again.")
+        return
     except pd.errors.ParserError:
         print("❌ The file could not be parsed as a CSV.")
+        return
     except Exception as e:
         print(f"❌ An unexpected error occurred: {e}")
+        return
 
     do_filter = input("\nWould you like to filter the data? (y/n): ").strip().lower()
 
